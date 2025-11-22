@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Когда на кнопку кликают, выполняется функция, описанная внутри
     button.addEventListener('click', function() {
         // Создаём всплывающее окно (alert) с сообщением
-        alert('Ура! Вы нажали на кнопку! Это работает благодаря JavaScript!');
+        alert('и нах ты нажал??');
 
         // (Дополнительно) Меняем текст кнопки после нажатия
         button.textContent = 'Кнопка нажата!';
