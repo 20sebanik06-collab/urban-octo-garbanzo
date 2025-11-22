@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игровая площадка</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .games-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .games-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .games-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .game-tab {
+            background: #35424a;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .game-tab:hover {
+            background: #e8491d;
+            transform: translateY(-2px);
+        }
+        
+        .game-tab.active {
+            background: #e8491d;
+            box-shadow: 0 4px 15px rgba(232, 73, 29, 0.3);
+        }
+        
+        .game-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .game-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Стили для Змейки */
+        #snakeGame {
+            text-align: center;
+        }
+        
+        #snakeCanvas {
+            border: 3px solid #35424a;
+            background: #000;
+            margin: 20px auto;
+            display: block;
+            max-width: 100%;
+        }
+        
+        .snake-controls {
+            margin: 20px 0;
+        }
+        
+        /* Стили для Крестиков-ноликов */
+        .tictactoe-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto 20px;
+            background: #35424a;
+            padding: 10px;
+            border-radius: 15px;
+        }
+        
+        .tictactoe-cell {
+            aspect-ratio: 1;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 2.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tictactoe-cell.x { color: #e8491d; }
+        .tictactoe-cell.o { color: #35424a; }
+        .tictactoe-cell.winner { background: #4CAF50; color: white; }
+        
+        /* Стили для Понга */
+        #pongGame {
+            text-align: center;
+        }
+        
+        #pongCanvas {
+            border: 3px solid #35424a;
+            background: #000;
+            margin: 20px auto;
+            display: block;
+            max-width: 100%;
+        }
+        
+        .pong-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .pong-key {
+            background: #35424a;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        /* Общие игровые стили */
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #e8491d;
+        }
+        
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            background: #35424a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            background: #e8491d;
+        }
+        
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideInRight 0.5s ease;
+        }
+        
+        .leaderboard {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .player-rank {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .player-rank.current {
+            background: #fff3cd;
+            border-radius: 8px;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .games-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .game-tab {
+                width: 200px;
+            }
+            
+            .tictactoe-board {
+                max-width: 300px;
+            }
+            
+            #pongCanvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="users.html">👥 Пользователи</a>
+            <a href="games.html">🎮 Игры</a>
+            <span id="profileLink" style="display: none;"></span>
+            <span id="authLinks">
+                <a href="login.html">Вход</a>
+                <a href="register.html">Регистрация</a>
+            </span>
+        </nav>
+    </header>
+
+    <main class="games-container">
+        <div class="games-header">
+            <h1>🎮 Игровая площадка</h1>
+            <p>Выберите игру и начинайте играть!</p>
+        </div>
+        
+        <div class="games-nav">
+            <button class="game-tab active" onclick="switchGame('snake')">🐍 Змейка</button>
+            <button class="game-tab" onclick="switchGame('tictactoe')">⭕ Крестики-нолики</button>
+            <button class="game-tab" onclick="switchGame('pong')">🎯 Понг</button>
+        </div>
+        
+        <!-- Игра Змейка -->
+        <div id="snakeGame" class="game-content active">
+            <h2>🐍 Змейка</h2>
+            <div class="game-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="snakeScore">0</div>
+                    <div>Счёт</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="snakeSpeed">1</div>
+                    <div>Скорость</div>
+                </div>
+            </div>
+            
+            <canvas id="snakeCanvas" width="400" height="400"></canvas>
+            
+            <div class="game-controls">
+                <button class="control-btn" onclick="snakeRestart()">🔄 Новая игра</button>
+                <button class="control-btn" onclick="snakeTogglePause()">⏸️ Пауза</button>
+            </div>
+            
+            <div class="snake-controls">
+                <p><strong>Управление:</strong> Стрелки ←↑→↓ или WASD</p>
+            </div>
+        </div>
+        
+        <!-- Игра Крестики-нолики -->
+        <div id="tictactoeGame" class="game-content">
+            <h2>⭕ Крестики-нолики</h2>
+            <div class="game-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="tttWins">0</div>
+                    <div>Победы</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="tttLosses">0</div>
+                    <div>Поражения</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="tttDraws">0</div>
+                    <div>Ничьи</div>
+                </div>
+            </div>
+            
+            <div id="tttMessage" style="text-align: center; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 10px;">
+                Ваш ход! Вы играете за ❌
+            </div>
+            
+            <div class="tictactoe-board" id="tttBoard">
+                <!-- Ячейки генерируются через JS -->
+            </div>
+            
+            <div class="game-controls">
+                <button class="control-btn" onclick="tttRestart()">🔄 Новая игра</button>
+                <button class="control-btn" onclick="tttSetDifficulty('easy')">😊 Легко</button>
+                <button class="control-btn" onclick="tttSetDifficulty('hard')">😠 Сложно</button>
+            </div>
+        </div>
+        
+        <!-- Игра Понг -->
+        <div id="pongGame" class="game-content">
+            <h2>🎯 Классический Понг</h2>
+            <div class="game-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="pongScore">0:0</div>
+                    <div>Счёт</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pongLevel">1</div>
+                    <div>Уровень</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pongBest">0</div>
+                    <div>Рекорд</div>
+                </div>
+            </div>
+            
+            <canvas id="pongCanvas" width="600" height="400"></canvas>
+            
+            <div class="pong-controls">
+                <div class="pong-key">← →</div>
+                <div>Движение платформы</div>
+                <div class="pong-key">Пробел</div>
+                <div>Старт/Пауза</div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="control-btn" onclick="pongRestart()">🔄 Новая игра</button>
+                <button class="control-btn" onclick="pongTogglePause()">⏸️ Пауза</button>
+                <button class="control-btn" onclick="pongChangeDifficulty()">🎯 Уровень: <span id="pongDifficulty">Средний</span></button>
+            </div>
+            
+            <div class="leaderboard">
+                <h3>🏆 Топ игроков Понга</h3>
+                <div id="pongLeaderboard">
+                    <!-- Рейтинг загружается через JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        // ===== ОБЩИЕ ФУНКЦИИ =====
+        
+        function switchGame(game) {
+            document.querySelectorAll('.game-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.game-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(game + 'Game').classList.add('active');
+            event.target.classList.add('active');
+            
+            if (game === 'snake' && !snakeInitialized) {
+                initSnake();
+            } else if (game === 'pong' && !pongInitialized) {
+                initPong();
+            }
+        }
+        
+        function showAchievement(text) {
+            const popup = document.createElement('div');
+            popup.className = 'achievement-popup';
+            popup.innerHTML = `🏆 ${text}`;
+            document.body.appendChild(popup);
+            
+            setTimeout(() => {
+                popup.remove();
+            }, 3000);
+        }
+
+        // ===== ИГРА "ЗМЕЙКА" =====
+        
+        let snakeInitialized = false;
+        let snakeGame;
+        
+        function initSnake() {
+            const canvas = document.getElementById('snakeCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const gridSize = 20;
+            const tileCount = canvas.width / gridSize;
+            
+            let snake = [{x: 10, y: 10}];
+            let food = {};
+            let dx = 0;
+            let dy = 0;
+            let score = 0;
+            let gameSpeed = 120;
+            let gameRunning = true;
+            
+            function createFood() {
+                food = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            }
+            
+            function gameLoop() {
+                if (!gameRunning) return;
+                
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+                snake.unshift(head);
+                
+                if (head.x === food.x && head.y === food.y) {
+                    score += 10;
+                    createFood();
+                    document.getElementById('snakeScore').textContent = score;
+                } else {
+                    snake.pop();
+                }
+                
+                if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount ||
+                    snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)) {
+                    gameRunning = false;
+                    ctx.fillStyle = 'white';
+                    ctx.font = '30px Arial';
+                    ctx.fillText('Конец игры!', canvas.width/2 - 80, canvas.height/2);
+                    return;
+                }
+                
+                ctx.fillStyle = '#4CAF50';
+                ctx.fillRect(snake[0].x * gridSize, snake[0].y * gridSize, gridSize-2, gridSize-2);
+                
+                ctx.fillStyle = '#8BC34A';
+                snake.slice(1).forEach(segment => {
+                    ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize-2, gridSize-2);
+                });
+                
+                ctx.fillStyle = '#e8491d';
+                ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize-2, gridSize-2);
+            }
+            
+            createFood();
+            snakeGame = setInterval(gameLoop, gameSpeed);
+            
+            document.addEventListener('keydown', (e) => {
+                if (!gameRunning) return;
+                
+                const goingUp = dy === -1;
+                const goingDown = dy === 1;
+                const goingRight = dx === 1;
+                const goingLeft = dx === -1;
+                
+                if ((e.key === 'ArrowLeft' || e.key === 'a') && !goingRight) {
+                    dx = -1; dy = 0;
+                }
+                if ((e.key === 'ArrowUp' || e.key === 'w') && !goingDown) {
+                    dx = 0; dy = -1;
+                }
+                if ((e.key === 'ArrowRight' || e.key === 'd') && !goingLeft) {
+                    dx = 1; dy = 0;
+                }
+                if ((e.key === 'ArrowDown' || e.key === 's') && !goingUp) {
+                    dx = 0; dy = 1;
+                }
+            });
+            
+            snakeInitialized = true;
+        }
+        
+        function snakeRestart() {
+            clearInterval(snakeGame);
+            snakeInitialized = false;
+            initSnake();
+        }
+        
+        function snakeTogglePause() {
+            alert('Пауза! Нажмите OK чтобы продолжить');
+        }
+
+        // ===== ИГРА "КРЕСТИКИ-НОЛИКИ" =====
+        
+        let tttBoard = ['','','','','','','','',''];
+        let tttCurrentPlayer = 'X';
+        let tttGameActive = true;
+        let tttStats = { wins: 0, losses: 0, draws: 0 };
+        
+        function initTTT() {
+            const boardElement = document.getElementById('tttBoard');
+            boardElement.innerHTML = '';
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('button');
+                cell.className = 'tictactoe-cell';
+                cell.setAttribute('data-index', i);
+                cell.addEventListener('click', () => tttHandleClick(i));
+                boardElement.appendChild(cell);
+            }
+            
+            loadTTTStats();
+        }
+        
+        function tttHandleClick(index) {
+            if (!tttGameActive || tttBoard[index] !== '' || tttCurrentPlayer !== 'X') return;
+            
+            tttMakeMove(index, 'X');
+            
+            if (tttGameActive) {
+                setTimeout(tttComputerMove, 500);
+            }
+        }
+        
+        function tttMakeMove(index, player) {
+            tttBoard[index] = player;
+            document.querySelector(`[data-index="${index}"]`).textContent = player;
+            document.querySelector(`[data-index="${index}"]`).classList.add(player.toLowerCase());
+            
+            if (tttCheckWinner()) {
+                tttGameActive = false;
+                if (tttCurrentPlayer === 'X') {
+                    tttStats.wins++;
+                    document.getElementById('tttMessage').textContent = '🎉 Вы выиграли!';
+                    document.getElementById('tttMessage').style.background = '#d4edda';
+                } else {
+                    tttStats.losses++;
+                    document.getElementById('tttMessage').textContent = '🤖 Компьютер выиграл!';
+                    document.getElementById('tttMessage').style.background = '#f8d7da';
+                }
+                saveTTTStats();
+            } else if (tttBoard.every(cell => cell !== '')) {
+                tttGameActive = false;
+                tttStats.draws++;
+                document.getElementById('tttMessage').textContent = '🤝 Ничья!';
+                document.getElementById('tttMessage').style.background = '#fff3cd';
+                saveTTTStats();
+            } else {
+                tttCurrentPlayer = tttCurrentPlayer === 'X' ? 'O' : 'X';
+                if (tttCurrentPlayer === 'X') {
+                    document.getElementById('tttMessage').textContent = 'Ваш ход!';
+                }
+            }
+            
+            updateTTTStats();
+        }
+        
+        function tttComputerMove() {
+            const emptyCells = tttBoard.map((cell, index) => cell === '' ? index : -1).filter(i => i !== -1);
+            if (emptyCells.length > 0) {
+                const move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                tttMakeMove(move, 'O');
+            }
+        }
+        
+        function tttCheckWinner() {
+            const patterns = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            return patterns.some(pattern => {
+                const [a,b,c] = pattern;
+                return tttBoard[a] && tttBoard[a] === tttBoard[b] && tttBoard[a] === tttBoard[c];
+            });
+        }
+        
+        function tttRestart() {
+            tttBoard = ['','','','','','','','',''];
+            tttCurrentPlayer = 'X';
+            tttGameActive = true;
+            
+            document.querySelectorAll('.tictactoe-cell').forEach(cell => {
+                cell.textContent = '';
+                cell.className = 'tictactoe-cell';
+            });
+            
+            document.getElementById('tttMessage').textContent = 'Ваш ход! Вы играете за ❌';
+            document.getElementById('tttMessage').style.background = '#f8f9fa';
+        }
+        
+        function tttSetDifficulty(level) {
+            showAchievement(`Уровень сложности: ${level === 'easy' ? 'Легкий' : 'Сложный'}`);
+        }
+        
+        function loadTTTStats() {
+            if (auth.isLoggedIn()) {
+                const user = auth.getCurrentUser();
+                const saved = localStorage.getItem(`ttt_stats_${user.id}`);
+                if (saved) {
+                    tttStats = JSON.parse(saved);
+                    updateTTTStats();
+                }
+            }
+        }
+        
+        function saveTTTStats() {
+            if (auth.isLoggedIn()) {
+                const user = auth.getCurrentUser();
+                localStorage.setItem(`ttt_stats_${user.id}`, JSON.stringify(tttStats));
+            }
+        }
+        
+        function updateTTTStats() {
+            document.getElementById('tttWins').textContent = tttStats.wins;
+            document.getElementById('tttLosses').textContent = tttStats.losses;
+            document.getElementById('tttDraws').textContent = tttStats.draws;
+        }
+
+        // ===== ИГРА "ПОНГ" =====
+        
+        let pongInitialized = false;
+        let pongGame;
+        let pongAnimation;
+        
+        function initPong() {
+            const canvas = document.getElementById('pongCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Игровые переменные
+            const paddleHeight = 80;
+            const paddleWidth = 10;
+            const ballSize = 10;
+            
+            let playerY = canvas.height / 2 - paddleHeight / 2;
+            let computerY = canvas.height / 2 - paddleHeight / 2;
+            let ballX = canvas.width / 2;
+            let ballY = canvas.height / 2;
+            let ballSpeedX = 5;
+            let ballSpeedY = 2;
+            
+            let playerScore = 0;
+            let computerScore = 0;
+            let gameRunning = false;
+            let difficulty = 1; // 1-легко, 2-средне, 3-сложно
+            
+            // Загрузка рекорда
+            loadPongBest();
+            updatePongLeaderboard();
+            
+            function draw() {
+                // Очистка canvas
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Рисуем разделительную линию
+                ctx.setLineDash([5, 15]);
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2, 0);
+                ctx.lineTo(canvas.width / 2, canvas.height);
+                ctx.strokeStyle = 'white';
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Рисуем платформы
+                ctx.fillStyle = '#e8491d';
+                ctx.fillRect(0, playerY, paddleWidth, paddleHeight);
+                ctx.fillRect(canvas.width - paddleWidth, computerY, paddleWidth, paddleHeight);
+                
+                // Рисуем мяч
+                ctx.fillStyle = 'white';
+                ctx.fillRect(ballX - ballSize / 2, ballY - ballSize / 2, ballSize, ballSize);
+                
+                // Рисуем счет
+                ctx.font = '30px Arial';
+                ctx.fillText(playerScore, canvas.width / 4, 40);
+                ctx.fillText(computerScore, 3 * canvas.width / 4, 40);
+            }
+            
+            function update() {
+                if (!gameRunning) return;
+                
+                // Движение мяча
+                ballX += ballSpeedX;
+                ballY += ballSpeedY;
+                
+                // Отскок от верхней и нижней стенки
+                if (ballY < 0 || ballY > canvas.height) {
+                    ballSpeedY = -ballSpeedY;
+                }
+                
+                // Отскок от платформ
+                if (ballX < paddleWidth && ballY > playerY && ballY < playerY + paddleHeight) {
+                    ballSpeedX = -ballSpeedX * 1.1; // Увеличиваем скорость
+                    ballSpeedY += (Math.random() - 0.5) * 2; // Случайный угол
+                }
+                
+                if (ballX > canvas.width - paddleWidth && ballY > computerY && ballY < computerY + paddleHeight) {
+                    ballSpeedX = -ballSpeedX * 1.1;
+                    ballSpeedY += (Math.random() - 0.5) * 2;
+                }
+                
+                // Забитие гола
+                if (ballX < 0) {
+                    computerScore++;
+                    resetBall();
+                }
+                
+                if (ballX > canvas.width) {
+                    playerScore++;
+                    resetBall();
+                    checkAchievements();
+                }
+                
+                // ИИ компьютера
+                const computerSpeed = difficulty * 2;
+                if (computerY + paddleHeight / 2 < ballY - 10) {
+                    computerY += computerSpeed;
+                } else if (computerY + paddleHeight / 2 > ballY + 10) {
+                    computerY -= computerSpeed;
+                }
+                
+                // Ограничение движения компьютера
+                computerY = Math.max(0, Math.min(canvas.height - paddleHeight, computerY));
+                
+                updatePongDisplay();
+            }
+            
+            function resetBall() {
+                ballX = canvas.width / 2;
+                ballY = canvas.height / 2;
+                ballSpeedX = (Math.random() > 0.5 ? 1 : -1) * 5;
+                ballSpeedY = (Math.random() - 0.5) * 4;
+                gameRunning = false;
+                
+                setTimeout(() => {
+                    gameRunning = true;
+                }, 1000);
+            }
+            
+            function gameLoop() {
+                update();
+                draw();
+            }
+            
+            // Управление
+            let keys = {};
+            
+            document.addEventListener('keydown', (e) => {
+                keys[e.key] = true;
+                
+                if (e.key === ' ') {
+                    if (!pongInitialized) {
+                        gameRunning = true;
+                        pongInitialized = true;
+                    } else {
+                        gameRunning = !gameRunning;
+                    }
+                }
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                keys[e.key] = false;
+            });
+            
+            function handleInput() {
+                const paddleSpeed = 8;
+                
+                if (keys['ArrowUp'] || keys['w']) {
+                    playerY = Math.max(0, playerY - paddleSpeed);
+                }
+                if (keys['ArrowDown'] || keys['s']) {
+                    playerY = Math.min(canvas.height - paddleHeight, playerY + paddleSpeed);
+                }
+            }
+            
+            // Главный игровой цикл
+            function mainLoop() {
+                handleInput();
+                gameLoop();
+                pongAnimation = requestAnimationFrame(mainLoop);
+            }
+            
+            resetBall();
+            mainLoop();
+        }
+        
+        function pongRestart() {
+            if (pongAnimation) {
+                cancelAnimationFrame(pongAnimation);
+            }
+            pongInitialized = false;
+            initPong();
+        }
+        
+        function pongTogglePause() {
+            // Пауза реализована через пробел
+            showAchievement('Используйте ПРОБЕЛ для паузы');
+        }
+        
+        function pongChangeDifficulty() {
+            const difficultyElement = document.getElementById('pongDifficulty');
+            const difficulties = ['Легкий', 'Средний', 'Сложный'];
+            let current = difficulties.indexOf(difficultyElement.textContent);
+            current = (current + 1) % difficulties.length;
+            difficultyElement.textContent = difficulties[current];
+            showAchievement(`Уровень: ${difficulties[current]}`);
+        }
+        
+        function updatePongDisplay() {
+            document.getElementById('pongScore').textContent = `${playerScore}:${computerScore}`;
+            document.getElementById('pongLevel').textContent = Math.floor((playerScore + computerScore) / 5) + 1;
+        }
+        
+        function loadPongBest() {
+            if (auth.isLoggedIn()) {
+                const user = auth.getCurrentUser();
+                const best = localStorage.getItem(`pong_best_${user.id}`) || 0;
+                document.getElementById('pongBest').textContent = best;
+            }
+        }
+        
+        function savePongBest() {
+            if (auth.isLoggedIn() && playerScore > document.getElementById('pongBest').textContent) {
+                const user = auth.getCurrentUser();
+                localStorage.setItem(`pong_best_${user.id}`, playerScore);
+                document.getElementById('pongBest').textContent = playerScore;
+                showAchievement('Новый рекорд! 🏆');
+            }
+        }
+        
+        function checkAchievements() {
+            if (playerScore === 5) showAchievement('Первая победа! 🎯');
+            if (playerScore === 10) showAchievement('Профи Понга! ⚡');
+        }
+        
+        function updatePongLeaderboard() {
+            const allUsers = auth.getUsers();
+            const players = allUsers.map(user => {
+                const best = parseInt(localStorage.getItem(`pong_best_${user.id}`) || '0');
+                return {
+                    username: user.username,
+                    bestScore: best,
+                    isCurrent: auth.isLoggedIn() && user.id === auth.getCurrentUser().id
+                };
+            }).sort((a, b) => b.bestScore - a.bestScore);
+            
+            document.getElementById('pongLeaderboard').innerHTML = players.slice(0, 5).map((player, i) => `
+                <div class="player-rank ${player.isCurrent ? 'current' : ''}">
+                    <div>${i + 1}. ${player.username}</div>
+                    <div>${player.bestScore}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Глобальные переменные для Понга
+        let playerScore = 0;
+        let computerScore = 0;
+
+        // ===== ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ =====
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initSnake();
+            initTTT();
+        });
+    </script>
+</body>
+</html>

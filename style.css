@@ -1,0 +1,109 @@
+/* Общие стили для всего тела страницы */
+body {
+    font-family: Arial, sans-serif; /* Устанавливаем шрифт */
+    margin: 0; /* Убираем внешние отступы */
+    padding: 0; /* Убираем внутренние отступы */
+    line-height: 1.6; /* Устанавливаем межстрочный интервал */
+    color: #d33636; /* Цвет текста - тёмно-серый */
+    background-color: #f4f4f4; /* Цвет фона страницы - светло-серый */
+}
+
+/* Стили для шапки */
+header {
+    background: #35424a; /* Тёмно-синий фон */
+    color: #ffffff; /* Белый текст */
+    padding: 20px 0; /* Отступы сверху и снизу 20px, слева и справа 0 */
+    text-align: center; /* Выравнивание текста по центру */
+}
+
+header nav a {
+    color: #ffffff; /* Белый цвет для ссылок */
+    text-decoration: none; /* Убираем подчёркивание у ссылок */
+    margin: 0 15px; /* Отступы слева и справа у ссылок */
+}
+
+header nav a:hover {
+    color: #e8491d; /* Цвет ссылки при наведении курсора - оранжевый */
+}
+
+/* Стили для основного контента */
+main {
+    padding: 20px; /* Внутренние отступы со всех сторон */
+    max-width: 800px; /* Максимальная ширина контента */
+    margin: 20px auto; /* Центрируем блок: отступ сверху/снизу 20px, слева/справа auto */
+    background: #ffffff; /* Белый фон для основного контента */
+    border-radius: 8px; /* Закругляем углы */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Добавляем лёгкую тень */
+}
+
+/* Стили для секций */
+section {
+    margin-bottom: 30px; /* Отступ снизу между секциями */
+}
+
+/* Стили для изображения */
+img {
+    max-width: 100%; /* Чтобы изображение не выходило за границы контейнера */
+    height: auto; /* Сохраняем пропорции */
+    border-radius: 5px; /* Немного закругляем углы у картинки */
+}
+
+/* Стили для кнопки */
+button {
+    background: #35424a; /* Тёмно-синий фон */
+    color: #fff; /* Белый текст */
+    border: none; /* Убираем стандартную рамку */
+    padding: 10px 20px; /* Внутренние отступы */
+    cursor: pointer; /* Меняем курсор на "указатель" при наведении */
+    border-radius: 5px; /* Закругляем углы */
+    font-size: 16px; /* Размер шрифта */
+}
+
+button:hover {
+    background: #e8491d; /* Меняем фон кнопки на оранжевый при наведении */
+}
+
+/* Стили для подвала */
+footer {
+    text-align: center; /* Текст по центру */
+    padding: 20px 0; /* Отступы сверху и снизу */
+    background: #35424a; /* Тёмно-синий фон */
+    color: #ffffff; /* Белый текст */
+    margin-top: 20px; /* Отступ сверху */
+}
+/* Стили для навигации с авторизацией */
+nav {
+    background: #35424a;
+    padding: 15px 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background 0.3s;
+    display: inline-block;
+}
+
+nav a:hover {
+    background: #e8491d;
+}
+
+#profileLink, #authLinks {
+    margin-left: auto;
+}
+
+#profileLink a {
+    background: #4CAF50;
+}
+
+#profileLink a:hover {
+    background: #45a049;
+}

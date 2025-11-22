@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Группы</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .groups-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .create-group-form {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .group-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .group-members {
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .join-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .join-btn:hover {
+            background: #45a049;
+        }
+        
+        .group-chat {
+            margin-top: 40px;
+        }
+        
+        .group-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="users.html">👥 Пользователи</a>
+        <a href="games.html">🎮 Игры</a>
+        <span id="profileLink" style="display: none;"></span>
+        <span id="authLinks">
+            <a href="login.html">Вход</a>
+            <a href="register.html">Регистрация</a>
+        </span>
+    </nav>
+</header>
+
+    <main class="groups-container">
+        <h1>👥 Группы</h1>
+        
+        <div class="create-group-form">
+            <h3>Создать новую группу</h3>
+            <form id="createGroupForm">
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="groupName" placeholder="Название группы" required style="width: 100%; padding: 10px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <textarea id="groupDescription" placeholder="Описание группы" style="width: 100%; padding: 10px; height: 80px;"></textarea>
+                </div>
+                <button type="submit" class="save-btn">Создать группу</button>
+            </form>
+        </div>
+        
+        <h3>Все группы</h3>
+        <div id="groupsList" class="groups-grid">
+            <!-- Список групп -->
+        </div>
+        
+        <div id="groupChatSection" class="group-chat" style="display: none;">
+            <h3>Чат группы: <span id="currentGroupName"></span></h3>
+            <div class="group-messages" id="groupMessages">
+                <!-- Сообщения группы -->
+            </div>
+            <div style="display: flex;">
+                <input type="text" id="groupMessageInput" placeholder="Сообщение для группы..." style="flex: 1; padding: 10px;">
+                <button class="send-btn" onclick="sendGroupMessage()">Отправить</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        let currentGroupId = null;
+        
+        function loadGroups() {
+            if (!auth.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const groupsList = document.getElementById('groupsList');
+            const groups = auth.getGroups();
+            
+            if (groups.length === 0) {
+                groupsList.innerHTML = '<p>Пока нет групп. Создайте первую!</p>';
+                return;
+            }
+            
+            groupsList.innerHTML = groups.map(group => {
+                const isMember = group.members.includes(auth.getCurrentUser().id);
+                const memberCount = group.members.length;
+                const creator = auth.getUserById(group.creator);
+                
+                return `
+                    <div class="group-card">
+                        <h4>${group.name}</h4>
+                        <p>${group.description}</p>
+                        <div class="group-members">
+                            Участников: ${memberCount}<br>
+                            Создатель: ${creator?.username || 'Неизвестный'}
+                        </div>
+                        ${!isMember ? 
+                            `<button class="join-btn" onclick="joinGroup('${group.id}')">Вступить</button>` :
+                            `<button class="join-btn" onclick="openGroupChat('${group.id}')">Открыть чат</button>`
+                        }
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function joinGroup(groupId) {
+            auth.joinGroup(groupId);
+            loadGroups();
+            alert('Вы успешно вступили в группу!');
+        }
+        
+        function openGroupChat(groupId) {
+            currentGroupId = groupId;
+            const group = auth.getGroups().find(g => g.id === groupId);
+            
+            document.getElementById('currentGroupName').textContent = group.name;
+            document.getElementById('groupChatSection').style.display = 'block';
+            loadGroupMessages(groupId);
+        }
+        
+        function loadGroupMessages(groupId) {
+            const groupMessages = document.getElementById('groupMessages');
+            const group = auth.getGroups().find(g => g.id === groupId);
+            
+            groupMessages.innerHTML = group.messages.map(msg => {
+                const user = auth.getUserById(msg.from);
+                const time = new Date(msg.timestamp).toLocaleTimeString('ru-RU');
+                
+                return `
+                    <div style="margin-bottom: 10px; padding: 10px; background: #f0f0f0; border-radius: 5px;">
+                        <strong>${user?.username || 'Неизвестный'}:</strong> ${msg.text}
+                        <div style="font-size: 0.8em; color: #666;">${time}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            groupMessages.scrollTop = groupMessages.scrollHeight;
+        }
+        
+        function sendGroupMessage() {
+            const input = document.getElementById('groupMessageInput');
+            const text = input.value.trim();
+            
+            if (text && currentGroupId) {
+                auth.addGroupMessage(currentGroupId, text);
+                input.value = '';
+                loadGroupMessages(currentGroupId);
+            }
+        }
+        
+        document.getElementById('createGroupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('groupName').value;
+            const description = document.getElementById('groupDescription').value;
+            
+            auth.createGroup(name, description);
+            document.getElementById('createGroupForm').reset();
+            loadGroups();
+            
+            alert('Группа успешно создана!');
+        });
+        
+        document.addEventListener('DOMContentLoaded', loadGroups);
+    </script>
+</body>
+</html>

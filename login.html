@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Стили такие же как в register.html */
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .auth-form h2 {
+            text-align: center;
+            color: #35424a;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #35424a;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            border-color: #35424a;
+            outline: none;
+        }
+        
+        .auth-btn {
+            background: #35424a;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        .auth-btn:hover {
+            background: #e8491d;
+        }
+        
+        .auth-links {
+            text-align: center;
+        }
+        
+        .auth-links a {
+            color: #35424a;
+            text-decoration: none;
+        }
+        
+        .auth-links a:hover {
+            color: #e8491d;
+        }
+        
+        .error-message {
+            color: #e8491d;
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: #ffeaea;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="users.html">👥 Пользователи</a>
+        <a href="games.html">🎮 Игры</a>
+        <span id="profileLink" style="display: none;"></span>
+        <span id="authLinks">
+            <a href="login.html">Вход</a>
+            <a href="register.html">Регистрация</a>
+        </span>
+    </nav>
+</header>
+
+    <main>
+        <div class="auth-container">
+            <form class="auth-form" id="loginForm">
+                <h2>Вход в аккаунт</h2>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="auth-btn">Войти</button>
+                
+                <div id="errorMessage" class="error-message"></div>
+                
+                <div class="auth-links">
+                    <p>Нет аккаунта? <a href="register.html">Зарегистрируйтесь</a></p>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const errorElement = document.getElementById('errorMessage');
+            
+            // Скрываем сообщение об ошибке
+            errorElement.style.display = 'none';
+            
+            try {
+                // Пытаемся войти
+                auth.login(email, password);
+                
+                // Перенаправляем на профиль
+                window.location.href = 'profile.html';
+                
+            } catch (error) {
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

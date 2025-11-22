@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты - Мессенджер</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .contacts-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .contacts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+        }
+        
+        .contacts-list {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .contact-item {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .contact-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .contact-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #35424a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+        }
+        
+        .contact-info {
+            flex: 1;
+        }
+        
+        .contact-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #35424a;
+            margin-bottom: 5px;
+        }
+        
+        .contact-bio {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .contact-status {
+            font-size: 0.8em;
+            color: #999;
+        }
+        
+        .status-online {
+            color: #4CAF50;
+        }
+        
+        .contact-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: #0084ff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .action-btn:hover {
+            background: #0073e6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="games.html">🎮 Игры</a>
+            <a href="chats.html">💬 Чаты</a>
+            <span id="profileLink" style="display: none;"></span>
+            <span id="authLinks">
+                <a href="login.html">Вход</a>
+                <a href="register.html">Регистрация</a>
+            </span>
+        </nav>
+    </header>
+
+    <main class="contacts-container">
+        <div class="contacts-header">
+            <h1>👥 Контакты</h1>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Поиск контактов..." id="contactsSearch">
+        </div>
+        
+        <div class="contacts-list" id="contactsList">
+            <!-- Список контактов загружается через JS -->
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        function loadContacts() {
+            if (!messenger.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const contactsList = document.getElementById('contactsList');
+            const users = messenger.getAllUsers();
+
+            if (users.length === 0) {
+                contactsList.innerHTML = `
+                    <div style="padding: 60px 20px; text-align: center; color: #666;">
+                        <div style="font-size: 4em; margin-bottom: 20px;">👥</div>
+                        <h3>Пока нет других пользователей</h3>
+                        <p>Расскажите друзьям о нашем мессенджере!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            contactsList.innerHTML = users.map(user => {
+                const statusClass = user.profile.status === 'online' ? 'status-online' : '';
+                const lastSeen = user.profile.status === 'online' ? 
+                    'В сети' : 
+                    `Был(а) ${new Date(user.profile.lastSeen).toLocaleString('ru-RU')}`;
+
+                return `
+                    <div class="contact-item">
+                        <div class="contact-avatar">${user.profile.avatar}</div>
+                        <div class="contact-info">
+                            <div class="contact-name">${user.username}</div>
+                            <div class="contact-bio">${user.profile.bio}</div>
+                            <div class="contact-status ${statusClass}">${lastSeen}</div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="action-btn" onclick="startChat('${user.id}')">💬</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function startChat(userId) {
+            const chat = messenger.createPrivateChat(userId);
+            window.location.href = `chats.html?chat=${chat.id}`;
+        }
+
+        // Поиск контактов
+        document.getElementById('contactsSearch').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const contactItems = document.querySelectorAll('.contact-item');
+            
+            contactItems.forEach(item => {
+                const name = item.querySelector('.contact-name').textContent.toLowerCase();
+                const bio = item.querySelector('.contact-bio').textContent.toLowerCase();
+                
+                if (name.includes(query) || bio.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', loadContacts);
+    </script>
+</body>
+</html>

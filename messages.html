@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мессенджер</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .messages-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-list {
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-right: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .messages-wrapper {
+            display: flex;
+            flex: 1;
+        }
+        
+        .chat-header {
+            background: #35424a;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .messages-list {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+        }
+        
+        .message.own {
+            background: #e8491d;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message.other {
+            background: #f0f0f0;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .message-time {
+            font-size: 0.8em;
+            opacity: 0.7;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .message-input {
+            display: flex;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        
+        .message-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        
+        .send-btn {
+            background: #35424a;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        
+        .send-btn:hover {
+            background: #e8491d;
+        }
+        
+        .chat-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .chat-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .chat-item.active {
+            background: #e8491d;
+            color: white;
+        }
+        
+        .chat-avatar {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="users.html">👥 Пользователи</a>
+        <a href="games.html">🎮 Игры</a>
+        <span id="profileLink" style="display: none;"></span>
+        <span id="authLinks">
+            <a href="login.html">Вход</a>
+            <a href="register.html">Регистрация</a>
+        </span>
+    </nav>
+</header>
+
+    <main class="messages-container">
+        <div class="messages-wrapper">
+            <div class="chat-list" id="chatList">
+                <h3>Чаты</h3>
+                <!-- Список чатов -->
+            </div>
+            
+            <div class="chat-area">
+                <div class="chat-header" id="chatHeader">
+                    Выберите чат
+                </div>
+                
+                <div class="messages-list" id="messagesList">
+                    <!-- Сообщения -->
+                </div>
+                
+                <div class="message-input">
+                    <input type="text" id="messageInput" placeholder="Введите сообщение..." disabled>
+                    <button class="send-btn" id="sendBtn" disabled>Отправить</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        let currentChatUserId = null;
+        
+        function loadChats() {
+            if (!auth.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const chatList = document.getElementById('chatList');
+            const allUsers = auth.getAllUsers();
+            const messages = auth.getMessages();
+            
+            // Получаем уникальных пользователей, с которыми есть переписка
+            const chatUsers = [...new Set(messages.map(msg => msg.from === auth.getCurrentUser().id ? msg.to : msg.from))];
+            
+            let chatsHTML = '';
+            
+            if (chatUsers.length === 0) {
+                chatsHTML = '<p>Нет активных чатов</p>';
+            } else {
+                chatsHTML = chatUsers.map(userId => {
+                    const user = auth.getUserById(userId);
+                    if (!user) return '';
+                    
+                    const lastMessage = messages
+                        .filter(msg => (msg.from === userId && msg.to === auth.getCurrentUser().id) || 
+                                      (msg.to === userId && msg.from === auth.getCurrentUser().id))
+                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+                    
+                    return `
+                        <div class="chat-item" onclick="openChat('${userId}')">
+                            <div class="chat-avatar">${user.profile.avatar}</div>
+                            <div>
+                                <strong>${user.username}</strong>
+                                ${lastMessage ? `<br><small>${lastMessage.text.substring(0, 30)}...</small>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Добавляем возможность начать новый чат
+            chatsHTML += '<h4 style="margin-top: 20px;">Начать новый чат:</h4>';
+            chatsHTML += allUsers.map(user => `
+                <div class="chat-item" onclick="openChat('${user.id}')">
+                    <div class="chat-avatar">${user.profile.avatar}</div>
+                    <div>${user.username}</div>
+                </div>
+            `).join('');
+            
+            chatList.innerHTML = chatsHTML;
+            
+            // Проверяем URL параметры для автоматического открытия чата
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetUser = urlParams.get('user');
+            if (targetUser) {
+                openChat(targetUser);
+            }
+        }
+        
+        function openChat(userId) {
+            currentChatUserId = userId;
+            const user = auth.getUserById(userId);
+            
+            document.getElementById('chatHeader').textContent = `Чат с ${user.username}`;
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            
+            loadMessages(userId);
+        }
+        
+        function loadMessages(userId) {
+            const messagesList = document.getElementById('messagesList');
+            const messages = auth.getMessages(userId);
+            
+            messagesList.innerHTML = messages.map(msg => {
+                const isOwn = msg.from === auth.getCurrentUser().id;
+                const sender = isOwn ? 'Вы' : auth.getUserById(msg.from)?.username || 'Неизвестный';
+                const time = new Date(msg.timestamp).toLocaleTimeString('ru-RU', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                return `
+                    <div class="message ${isOwn ? 'own' : 'other'}">
+                        <div class="message-sender">${sender}</div>
+                        <div>${msg.text}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (text && currentChatUserId) {
+                auth.addMessage(currentChatUserId, text);
+                input.value = '';
+                loadMessages(currentChatUserId);
+            }
+        }
+        
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', loadChats);
+    </script>
+</body>
+</html>

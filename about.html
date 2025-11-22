@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обо мне - Мой сайт</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .about-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #35424a, #e8491d);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .hero-section h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .hero-section .subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .profile-card {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            gap: 30px;
+        }
+        
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #e8491d;
+            flex-shrink: 0;
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .profile-info h2 {
+            color: #35424a;
+            margin-bottom: 15px;
+            font-size: 2em;
+        }
+        
+        .profile-info .tagline {
+            font-size: 1.2em;
+            color: #e8491d;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #e8491d;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #35424a;
+            font-weight: bold;
+        }
+        
+        .skills-section {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .skill-category h3 {
+            color: #35424a;
+            margin-bottom: 15px;
+            border-left: 4px solid #e8491d;
+            padding-left: 10px;
+        }
+        
+        .skill-item {
+            background: white;
+            padding: 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e8491d;
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            background: white;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            width: calc(50% - 40px);
+        }
+        
+        .timeline-item:nth-child(odd) {
+            margin-left: 0;
+            margin-right: auto;
+        }
+        
+        .timeline-item:nth-child(even) {
+            margin-left: auto;
+            margin-right: 0;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: #35424a;
+            border: 3px solid #e8491d;
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .timeline-item:nth-child(odd)::before {
+            right: -50px;
+        }
+        
+        .timeline-item:nth-child(even)::before {
+            left: -50px;
+        }
+        
+        .timeline-date {
+            color: #e8491d;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .hobbies-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .hobbies-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .hobby-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-width: 150px;
+            transition: transform 0.3s ease;
+        }
+        
+        .hobby-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .hobby-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .contact-cta {
+            text-align: center;
+            background: linear-gradient(135deg, #e8491d, #35424a);
+            color: white;
+            padding: 50px 20px;
+            border-radius: 15px;
+            margin-top: 40px;
+        }
+        
+        .contact-cta h2 {
+            margin-bottom: 20px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #35424a;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: #f4f4f4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .profile-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-image {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .timeline::before {
+                left: 20px;
+            }
+            
+            .timeline-item {
+                width: calc(100% - 60px);
+                margin-left: 40px !important;
+                margin-right: 0 !important;
+            }
+            
+            .timeline-item::before {
+                left: -40px !important;
+                right: auto !important;
+            }
+            
+            .hero-section h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <a href="index.html">Главная</a>
+        <a href="users.html">👥 Пользователи</a>
+        <a href="games.html">🎮 Игры</a>
+        <span id="profileLink" style="display: none;"></span>
+        <span id="authLinks">
+            <a href="login.html">Вход</a>
+            <a href="register.html">Регистрация</a>
+        </span>
+    </nav>
+</header>
+
+    <main class="about-container">
+        <!-- Герой-секция -->
+        <section class="hero-section">
+            <h1>Обо мне</h1>
+            <p class="subtitle">Веб-разработчик, создающий цифровые решения которые вдохновляют и решают реальные проблемы</p>
+        </section>
+
+        <!-- Профильная карточка -->
+        <section class="profile-card">
+            <img src="https://img02.rl0.ru/afisha/e750x-i/daily.afisha.ru/uploads/images/6/e5/6e5a713fb8d534791c6eed2e47be9640.jpg" 
+                 alt="Моё фото" class="profile-image">
+            <div class="profile-info">
+                <h2>Привет, я [Ваше Имя]!</h2>
+                <p class="tagline">Full-stack разработчик & UI/UX энтузиаст</p>
+                <p>Я страстно увлечён созданием современных веб-приложений, которые сочетают в себе красивый дизайн и мощную функциональность. Специализируюсь на frontend разработке, но также имею опыт работы с backend технологиями.</p>
+                <p>Верю, что хороший код должен быть не только функциональным, но и читаемым, поддерживаемым и масштабируемым. Постоянно учусь новым технологиям и слежу за трендами в веб-разработке.</p>
+            </div>
+        </section>
+
+        <!-- Статистика -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">2+</div>
+                <div class="stat-label">Года опыта</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Завершенных проектов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Довольных клиентов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Страсть к коду</div>
+            </div>
+        </div>
+
+        <!-- Навыки -->
+        <section class="skills-section">
+            <h2 style="text-align: center; color: #35424a; margin-bottom: 30px;">Мои навыки</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h3>Frontend</h3>
+                    <div class="skill-item">HTML5 & CSS3</div>
+                    <div class="skill-item">JavaScript (ES6+)</div>
+                    <div class="skill-item">React & Vue.js</div>
+                    <div class="skill-item">Responsive Design</div>
+                </div>
+                <div class="skill-category">
+                    <h3>Backend</h3>
+                    <div class="skill-item">Node.js</div>
+                    <div class="skill-item">Python</div>
+                    <div class="skill-item">RESTful APIs</div>
+                    <div class="skill-item">Базы данных</div>
+                </div>
+                <div class="skill-category">
+                    <h3>Инструменты</h3>
+                    <div class="skill-item">Git & GitHub</div>
+                    <div class="skill-item">VS Code</div>
+                    <div class="skill-item">Figma</div>
+                    <div class="skill-item">Webpack</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Таймлайн -->
+        <section>
+            <h2 style="text-align: center; color: #35424a; margin: 50px 0 30px;">Мой путь</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">2022 - Настоящее время</div>
+                    <h3>Full-stack разработчик</h3>
+                    <p>Работа над различными веб-проектами, от лендингов до сложных веб-приложений. Постоянное обучение и совершенствование навыков.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2021 - 2022</div>
+                    <h3>Изучение веб-разработки</h3>
+                    <p>Интенсивное изучение HTML, CSS, JavaScript и фреймворков. Создание первых проектов и участие в хакатонах.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2020 - 2021</div>
+                    <h3>Начало пути</h3>
+                    <p>Первые шаги в программировании. Изучение основ компьютерных наук и алгоритмов.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Хобби -->
+        <section class="hobbies-section">
+            <h2 style="color: #35424a; margin-bottom: 30px;">Мои увлечения</h2>
+            <div class="hobbies-grid">
+                <div class="hobby-item">
+                    <div class="hobby-icon">🎮</div>
+                    <div>Игры</div>
+                </div>
+                <div class="hobby-item">
+                    <div class="hobby-icon">📚</div>
+                    <div>Чтение</div>
+                </div>
+                <div class="hobby-item">
+                    <div class="hobby-icon">🎵</div>
+                    <div>Музыка</div>
+                </div>
+                <div class="hobby-item">
+                    <div class="hobby-icon">🚴</div>
+                    <div>Велоспорт</div>
+                </div>
+                <div class="hobby-item">
+                    <div class="hobby-icon">✈️</div>
+                    <div>Путешествия</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Призыв к действию -->
+        <section class="contact-cta">
+            <h2>Готовы создать что-то удивительное вместе?</h2>
+            <p>Я всегда открыт для новых вызовов и интересных проектов. Давайте обсудим ваши идеи!</p>
+            <a href="contacts.html" class="cta-button">Связаться со мной</a>
+        </section>
+    </main>
+
+    <script src="auth.js"></script>
+</body>
+</html>
